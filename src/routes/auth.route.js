@@ -32,7 +32,19 @@ router.post("/login", passport.authenticate("local"), (req, res) => {
 router.post("/logout", (req, res) => {
   req.logout((err) => {
     if (err) return res.status(500).json({ message: "Logout failed" });
-    res.json({ message: "Logout successful" });
+
+    // 2. Clear session cookie
+    req.session.destroy();
+    res.clearCookie('connect.sid');
+
+    // 3. For JWT, we can't invalidate the token on server side
+    // Client needs to remove the token themselves
+    // Optionally, we could maintain a blacklist of invalid tokens
+
+    res.json({
+      message: "Logout successful",
+      note: "Please remove JWT token from client storage"
+    });
   });
 });
 
